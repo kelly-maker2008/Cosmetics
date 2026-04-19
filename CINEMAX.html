@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CINEMAX — Premium Cinema</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #080808;
+      --dark: #111111;
+      --card: #161616;
+      --border: #242424;
+      --gold: #D4A843;
+      --gold-dim: #8a6b28;
+      --white: #F5F0E8;
+      --muted: #888;
+      --red: #C0392B;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CUSTOM CURSOR */
+    .cursor {
+      position: fixed; width: 10px; height: 10px;
+      background: var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+    }
+    .cursor-ring {
+      position: fixed; width: 36px; height: 36px;
+      border: 1px solid rgba(212,168,67,0.5);
+      border-radius: 50%; pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease, width 0.3s, height 0.3s;
+    }
+    body:hover .cursor { opacity: 1; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 4rem;
+      background: linear-gradient(180deg, rgba(8,8,8,0.95) 0%, transparent 100%);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 0.12em;
+      color: var(--white);
+    }
+    .logo span { color: var(--gold); }
+    nav ul { list-style: none; display: flex; gap: 2.5rem; }
+    nav ul li a {
+      text-decoration: none; color: var(--muted);
+      font-size: 0.78rem; letter-spacing: 0.15em;
+      text-transform: uppercase; font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav ul li a:hover { color: var(--white); }
+    .nav-actions { display: flex; gap: 1rem; align-items: center; }
+    .btn-search {
+      background: none; border: none; color: var(--muted);
+      cursor: none; font-size: 1.1rem; transition: color 0.2s;
+    }
+    .btn-search:hover { color: var(--gold); }
+    .btn-signin {
+      background: none; border: 1px solid var(--border);
+      color: var(--white); padding: 0.5rem 1.4rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: none; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-signin:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* HERO */
+    .hero {
+      position: relative; height: 100vh; overflow: hidden;
+      display: flex; align-items: flex-end; padding: 0 4rem 6rem;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1800&q=80') center/cover no-repeat;
+    }
+    .hero-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(
+        to top,
+        var(--black) 0%,
+        rgba(8,8,8,0.6) 50%,
+        rgba(8,8,8,0.3) 100%
+      );
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 700px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.3);
+      padding: 0.35rem 1rem; font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.2s both;
+    }
+    .hero-badge::before { content: '●'; font-size: 0.5rem; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 9vw, 8rem);
+      line-height: 0.95; letter-spacing: 0.02em;
+      animation: fadeUp 0.8s 0.4s both;
+    }
+    .hero-meta {
+      display: flex; gap: 1.5rem; align-items: center;
+      margin: 1.5rem 0; font-size: 0.82rem; color: var(--muted);
+      animation: fadeUp 0.8s 0.6s both;
+    }
+    .rating { color: var(--gold); font-weight: 500; }
+    .genre-tag {
+      border: 1px solid var(--border); padding: 0.2rem 0.7rem;
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .hero-desc {
+      font-size: 0.95rem; line-height: 1.8; max-width: 520px;
+      color: rgba(245,240,232,0.7);
+      animation: fadeUp 0.8s 0.7s both;
+      margin-bottom: 2.5rem;
+    }
+    .hero-actions {
+      display: flex; gap: 1rem; align-items: center;
+      animation: fadeUp 0.8s 0.9s both;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: var(--gold); color: var(--black);
+      border: none; padding: 0.9rem 2.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: none; transition: background 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { background: #e8bc56; transform: translateY(-1px); }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--white); padding: 0.9rem 2.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem; font-weight: 300;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: none; transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); }
+    .hero-scroll {
+      position: absolute; right: 4rem; bottom: 5rem;
+      display: flex; flex-direction: column; align-items: center; gap: 1rem;
+      z-index: 2;
+    }
+    .scroll-line {
+      width: 1px; height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--gold));
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%,100%{height:80px;opacity:0.5} 50%{height:100px;opacity:1} }
+    .scroll-label {
+      writing-mode: vertical-lr; font-size: 0.65rem;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SECTION STRUCTURE */
+    section { padding: 5rem 4rem; }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 3rem;
+    }
+    .section-label {
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: 0.04em;
+    }
+    .section-link {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.75rem; letter-spacing: 0.15em;
+      text-transform: uppercase; border-bottom: 1px solid var(--border);
+      padding-bottom: 2px; transition: color 0.2s, border-color 0.2s;
+    }
+    .section-link:hover { color: var(--gold); border-color: var(--gold); }
+
+    /* TRENDING TICKER */
+    .ticker-wrap {
+      background: var(--gold); padding: 0.6rem 0;
+      overflow: hidden; white-space: nowrap;
+    }
+    .ticker {
+      display: inline-block;
+      animation: ticker 30s linear infinite;
+    }
+    .ticker span {
+      display: inline-block; padding: 0 3rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem; letter-spacing: 0.2em;
+      color: var(--black);
+    }
+    .ticker span::after { content: '✦'; margin-left: 3rem; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* MOVIE CARDS */
+    .movies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    .movie-card {
+      position: relative; overflow: hidden;
+      background: var(--card); border: 1px solid var(--border);
+      transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94),
+                  border-color 0.3s;
+      cursor: none;
+    }
+    .movie-card:hover { transform: translateY(-6px); border-color: var(--gold-dim); }
+    .movie-card:hover .card-overlay { opacity: 1; }
+    .movie-card:hover .card-img { transform: scale(1.06); }
+    .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 2/3; }
+    .card-img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,8,8,0.95) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.3s;
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 1.2rem;
+    }
+    .card-play {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--gold); border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; cursor: none; margin-bottom: 0.8rem;
+      transition: transform 0.2s;
+    }
+    .card-play:hover { transform: scale(1.1); }
+    .card-overlay-genres { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .ov-tag {
+      font-size: 0.6rem; letter-spacing: 0.1em;
+      text-transform: uppercase; background: rgba(255,255,255,0.1);
+      padding: 0.2rem 0.5rem;
+    }
+    .card-rating {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      background: rgba(8,8,8,0.85); border: 1px solid var(--gold-dim);
+      color: var(--gold); font-size: 0.7rem; font-weight: 500;
+      padding: 0.2rem 0.5rem; display: flex; align-items: center; gap: 0.3rem;
+    }
+    .card-body { padding: 1rem; }
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.15rem; letter-spacing: 0.05em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-meta {
+      display: flex; justify-content: space-between;
+      font-size: 0.72rem; color: var(--muted); margin-top: 0.4rem;
+    }
+
+    /* FEATURED ROW — wide card */
+    .featured-grid {
+      display: grid; grid-template-columns: 1.8fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1.5rem;
+    }
+    .featured-main {
+      grid-row: 1 / 3;
+      position: relative; overflow: hidden;
+      border: 1px solid var(--border); cursor: none;
+    }
+    .featured-main img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .featured-main:hover img { transform: scale(1.04); }
+    .featured-main-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, var(--black) 0%, transparent 100%);
+      padding: 2.5rem 2rem;
+    }
+    .featured-main-label {
+      font-size: 0.62rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem;
+    }
+    .featured-main-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem); letter-spacing: 0.04em;
+      line-height: 1; margin-bottom: 0.8rem;
+    }
+    .featured-main-desc {
+      font-size: 0.82rem; line-height: 1.7;
+      color: rgba(245,240,232,0.65); max-width: 340px;
+    }
+    .small-card {
+      position: relative; overflow: hidden;
+      border: 1px solid var(--border); aspect-ratio: 16/9;
+      cursor: none; transition: border-color 0.3s;
+    }
+    .small-card:hover { border-color: var(--gold-dim); }
+    .small-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s; filter: brightness(0.7);
+    }
+    .small-card:hover img { transform: scale(1.05); filter: brightness(0.85); }
+    .small-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,8,8,0.9) 0%, transparent 60%);
+      padding: 1rem;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .small-card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem; letter-spacing: 0.04em;
+    }
+    .small-card-meta { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* GENRES STRIP */
+    .genres-strip {
+      display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.5rem;
+    }
+    .genres-strip::-webkit-scrollbar { display: none; }
+    .genre-pill {
+      flex-shrink: 0; padding: 0.6rem 1.8rem;
+      border: 1px solid var(--border);
+      font-size: 0.75rem; letter-spacing: 0.1em;
+      text-transform: uppercase; cursor: none;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      white-space: nowrap; color: var(--muted);
+    }
+    .genre-pill:hover, .genre-pill.active {
+      background: var(--gold); border-color: var(--gold);
+      color: var(--black);
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+    }
+    .stat {
+      padding: 2.5rem 3rem;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem; letter-spacing: 0.04em;
+      color: var(--gold); line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.72rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    /* NEWSLETTER */
+    .newsletter {
+      background: var(--dark); border: 1px solid var(--border);
+      display: grid; grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+    .newsletter-left { padding: 4rem; }
+    .newsletter-label {
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 1rem;
+    }
+    .newsletter-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 3.5vw, 3rem); letter-spacing: 0.04em;
+      line-height: 1.05; margin-bottom: 1.5rem;
+    }
+    .newsletter-form { display: flex; gap: 0; max-width: 440px; }
+    .newsletter-input {
+      flex: 1; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border); border-right: none;
+      color: var(--white); padding: 0.85rem 1.2rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    .newsletter-input:focus { border-color: var(--gold-dim); }
+    .newsletter-input::placeholder { color: var(--muted); }
+    .newsletter-btn {
+      background: var(--gold); border: 1px solid var(--gold);
+      color: var(--black); padding: 0.85rem 1.8rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.75rem;
+      font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: none; transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .newsletter-btn:hover { background: #e8bc56; }
+    .newsletter-right {
+      position: relative; overflow: hidden;
+      background: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80') center/cover;
+    }
+    .newsletter-right::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to right, var(--dark) 0%, transparent 80%);
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid var(--border);
+      padding: 4rem 4rem 2rem;
+    }
+    .footer-top {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 4rem; margin-bottom: 3rem;
+    }
+    .footer-brand .logo { font-size: 1.8rem; margin-bottom: 1rem; }
+    .footer-desc {
+      font-size: 0.83rem; line-height: 1.8;
+      color: var(--muted); max-width: 280px;
+    }
+    .footer-col h4 {
+      font-size: 0.65rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+    .footer-col ul li a {
+      text-decoration: none; color: var(--muted);
+      font-size: 0.83rem; transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+      font-size: 0.72rem; color: var(--muted);
+    }
+    .social-links { display: flex; gap: 1.2rem; }
+    .social-link {
+      width: 36px; height: 36px; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; color: var(--muted); font-size: 0.85rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .social-link:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 1.5rem; }
+      nav ul { display: none; }
+      section { padding: 3rem 1.5rem; }
+      .hero { padding: 0 1.5rem 4rem; }
+      .featured-grid { grid-template-columns: 1fr; }
+      .featured-main { grid-row: unset; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .newsletter { grid-template-columns: 1fr; }
+      .newsletter-right { display: none; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">CINE<span>MAX</span></div>
+    <ul>
+      <li><a href="#">Movies</a></li>
+      <li><a href="#">Series</a></li>
+      <li><a href="#">Premieres</a></li>
+      <li><a href="#">Reviews</a></li>
+      <li><a href="#">Archive</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-search">⌕</button>
+      <button class="btn-signin">Sign In</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">Now Showing — Featured Film</div>
+      <h1>Dune:<br>Part Two</h1>
+      <div class="hero-meta">
+        <span class="rating">★ 8.8</span>
+        <span>2024</span>
+        <span>2h 46m</span>
+        <span class="genre-tag">Sci-Fi</span>
+        <span class="genre-tag">Epic</span>
+      </div>
+      <p class="hero-desc">Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe.</p>
+      <div class="hero-actions">
+        <button class="btn-primary">▶ &nbsp;Watch Now</button>
+        <button class="btn-outline">+ &nbsp;Watchlist</button>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span class="scroll-label">Scroll</span>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>Oppenheimer</span><span>Poor Things</span><span>Past Lives</span>
+      <span>The Zone of Interest</span><span>Anatomy of a Fall</span>
+      <span>American Fiction</span><span>Maestro</span><span>Killers of the Flower Moon</span>
+      <span>Oppenheimer</span><span>Poor Things</span><span>Past Lives</span>
+      <span>The Zone of Interest</span><span>Anatomy of a Fall</span>
+      <span>American Fiction</span><span>Maestro</span><span>Killers of the Flower Moon</span>
+    </div>
+  </div>
+
+  <!-- TRENDING -->
+  <section>
+    <div class="section-header">
+      <div>
+        <div class="section-label">🔥 Hot Right Now</div>
+        <h2 class="section-title">Trending This Week</h2>
+      </div>
+      <a href="#" class="section-link">View All →</a>
+    </div>
+    <div class="movies-grid">
+      <!-- Card 1 -->
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&q=80" alt="Movie">
+          <div class="card-rating">★ 9.0</div>
+          <div class="card-overlay">
+            <button class="card-play">▶</button>
+            <div class="card-overlay-genres">
+              <span class="ov-tag">Drama</span><span class="ov-tag">History</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Oppenheimer</div>
+          <div class="card-meta"><span>2023</span><span>3h 0m</span></div>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=80" alt="Movie">
+          <div class="card-rating">★ 8.4</div>
+          <div class="card-overlay">
+            <button class="card-play">▶</button>
+            <div class="card-overlay-genres">
+              <span class="ov-tag">Comedy</span><span class="ov-tag">Fantasy</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Poor Things</div>
+          <div class="card-meta"><span>2023</span><span>2h 21m</span></div>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1596727147705-61a532a659bd?w=400&q=80" alt="Movie">
+          <div class="card-rating">★ 8.0</div>
+          <div class="card-overlay">
+            <button class="card-play">▶</button>
+            <div class="card-overlay-genres">
+              <span class="ov-tag">Romance</span><span class="ov-tag">Drama</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Past Lives</div>
+          <div class="card-meta"><span>2023</span><span>1h 46m</span></div>
+        </div>
+      </div>
+      <!-- Card 4 -->
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&q=80" alt="Movie">
+          <div class="card-rating">★ 7.8</div>
+          <div class="card-overlay">
+            <button class="card-play">▶</button>
+            <div class="card-overlay-genres">
+              <span class="ov-tag">War</span><span class="ov-tag">Drama</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Zone of Interest</div>
+          <div class="card-meta"><span>2023</span><span>1h 45m</span></div>
+        </div>
+      </div>
+      <!-- Card 5 -->
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=400&q=80" alt="Movie">
+          <div class="card-rating">★ 8.5</div>
+          <div class="card-overlay">
+            <button class="card-play">▶</button>
+            <div class="card-overlay-genres">
+              <span class="ov-tag">Thriller</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Anatomy of a Fall</div>
+          <div class="card-meta"><span>2023</span><span>2h 31m</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GENRES -->
+  <section style="padding-top: 0;">
+    <div class="section-label" style="margin-bottom:1.2rem;">Browse by Genre</div>
+    <div class="genres-strip">
+      <div class="genre-pill active">All</div>
+      <div class="genre-pill">Action</div>
+      <div class="genre-pill">Drama</div>
+      <div class="genre-pill">Sci-Fi</div>
+      <div class="genre-pill">Horror</div>
+      <div class="genre-pill">Comedy</div>
+      <div class="genre-pill">Thriller</div>
+      <div class="genre-pill">Romance</div>
+      <div class="genre-pill">Animation</div>
+      <div class="genre-pill">Documentary</div>
+      <div class="genre-pill">Crime</div>
+      <div class="genre-pill">Fantasy</div>
+    </div>
+  </section>
+
+  <!-- FEATURED EDITORIAL -->
+  <section>
+    <div class="section-header">
+      <div>
+        <div class="section-label">Editor's Pick</div>
+        <h2 class="section-title">Must-Watch Selection</h2>
+      </div>
+      <a href="#" class="section-link">Full List →</a>
+    </div>
+    <div class="featured-grid">
+      <div class="featured-main">
+        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=900&q=80" alt="Featured">
+        <div class="featured-main-overlay">
+          <div class="featured-main-label">★ 8.8 · Epic Sci-Fi</div>
+          <div class="featured-main-title">Killers of the<br>Flower Moon</div>
+          <p class="featured-main-desc">Martin Scorsese's sweeping epic unravels the Osage Indian murders of the 1920s in a story of love, greed, and deceit.</p>
+        </div>
+      </div>
+      <div class="small-card">
+        <img src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80" alt="Movie">
+        <div class="small-card-overlay">
+          <div class="small-card-title">Maestro</div>
+          <div class="small-card-meta">★ 7.2 · 2023 · Biography</div>
+        </div>
+      </div>
+      <div class="small-card">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" alt="Movie">
+        <div class="small-card-overlay">
+          <div class="small-card-title">American Fiction</div>
+          <div class="small-card-meta">★ 7.7 · 2023 · Drama</div>
+        </div>
+      </div>
+      <div class="small-card">
+        <img src="https://images.unsplash.com/photo-1512070679279-8988d32161be?w=600&q=80" alt="Movie">
+        <div class="small-card-overlay">
+          <div class="small-card-title">The Holdovers</div>
+          <div class="small-card-meta">★ 7.9 · 2023 · Comedy</div>
+        </div>
+      </div>
+      <div class="small-card">
+        <img src="https://images.unsplash.com/photo-1492573637402-25691cd9c3c9?w=600&q=80" alt="Movie">
+        <div class="small-card-overlay">
+          <div class="small-card-title">Society of the Snow</div>
+          <div class="small-card-meta">★ 8.0 · 2023 · Survival</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section style="padding: 0 4rem;">
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-num">12K+</div>
+        <div class="stat-label">Films in Library</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">98</div>
+        <div class="stat-label">New This Month</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4.8M</div>
+        <div class="stat-label">Active Members</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">140+</div>
+        <div class="stat-label">Countries Streaming</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW RELEASES -->
+  <section>
+    <div class="section-header">
+      <div>
+        <div class="section-label">Just Dropped</div>
+        <h2 class="section-title">New Releases</h2>
+      </div>
+      <a href="#" class="section-link">See All →</a>
+    </div>
+    <div class="movies-grid">
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=400&q=80" alt="">
+          <div class="card-rating">★ 7.5</div>
+          <div class="card-overlay"><button class="card-play">▶</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Civil War</div>
+          <div class="card-meta"><span>2024</span><span>1h 49m</span></div>
+        </div>
+      </div>
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&q=80" alt="">
+          <div class="card-rating">★ 8.1</div>
+          <div class="card-overlay"><button class="card-play">▶</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Challengers</div>
+          <div class="card-meta"><span>2024</span><span>2h 11m</span></div>
+        </div>
+      </div>
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1502786129293-79981df4e689?w=400&q=80" alt="">
+          <div class="card-rating">★ 7.9</div>
+          <div class="card-overlay"><button class="card-play">▶</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Monkey Man</div>
+          <div class="card-meta"><span>2024</span><span>1h 53m</span></div>
+        </div>
+      </div>
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1523207911345-32501502db22?w=400&q=80" alt="">
+          <div class="card-rating">★ 6.9</div>
+          <div class="card-overlay"><button class="card-play">▶</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Godzilla x Kong</div>
+          <div class="card-meta"><span>2024</span><span>1h 55m</span></div>
+        </div>
+      </div>
+      <div class="movie-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="https://images.unsplash.com/photo-1493752306086-6ac0b9e9cb48?w=400&q=80" alt="">
+          <div class="card-rating">★ 8.3</div>
+          <div class="card-overlay"><button class="card-play">▶</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Dune: Part Two</div>
+          <div class="card-meta"><span>2024</span><span>2h 46m</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section style="padding: 0 4rem 5rem;">
+    <div class="newsletter">
+      <div class="newsletter-left">
+        <div class="newsletter-label">Stay Ahead</div>
+        <h2 class="newsletter-title">Never Miss a<br>New Release</h2>
+        <div class="newsletter-form">
+          <input class="newsletter-input" type="email" placeholder="Your email address">
+          <button class="newsletter-btn">Subscribe</button>
+        </div>
+      </div>
+      <div class="newsletter-right"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">CINE<span>MAX</span></div>
+        <p class="footer-desc">Your premium destination for cinematic storytelling. Curated films, exclusive reviews, and a community of passionate film lovers.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#">New Releases</a></li>
+          <li><a href="#">Top Rated</a></li>
+          <li><a href="#">Awards Season</a></li>
+          <li><a href="#">Classics</a></li>
+          <li><a href="#">Documentaries</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <ul>
+          <li><a href="#">Sign In</a></li>
+          <li><a href="#">Create Account</a></li>
+          <li><a href="#">Watchlist</a></li>
+          <li><a href="#">Reviews</a></li>
+          <li><a href="#">Settings</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 CINEMAX — All Rights Reserved</span>
+      <div class="social-links">
+        <a href="#" class="social-link">𝕏</a>
+        <a href="#" class="social-link">in</a>
+        <a href="#" class="social-link">ig</a>
+        <a href="#" class="social-link">yt</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      setTimeout(() => {
+        cursorRing.style.left = e.clientX + 'px';
+        cursorRing.style.top = e.clientY + 'px';
+      }, 60);
+    });
+    document.querySelectorAll('button, a, .movie-card, .small-card, .genre-pill').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '16px'; cursor.style.height = '16px';
+        cursorRing.style.width = '52px'; cursorRing.style.height = '52px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '10px'; cursor.style.height = '10px';
+        cursorRing.style.width = '36px'; cursorRing.style.height = '36px';
+      });
+    });
+
+    // Genre pill toggle
+    document.querySelectorAll('.genre-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+      });
+    });
+
+    // Scroll-reveal cards
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationDelay = (i * 0.08) + 's';
+          entry.target.style.animation = 'fadeUp 0.6s both';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.movie-card, .small-card, .stat').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
